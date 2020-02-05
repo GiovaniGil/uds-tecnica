@@ -18,11 +18,6 @@
       <v-spacer></v-spacer>
     </v-app-bar>
     <v-content>
-      <div id="nav">
-        <router-link to="/">Home</router-link> |
-        <router-link to="/about">About</router-link> |
-        <router-link to="/pedido">Pedido</router-link>
-      </div>
       <vue-page-transition name="fade-in-right">
         <router-view/>
       </vue-page-transition>
