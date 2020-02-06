@@ -13,6 +13,26 @@ export function makeServer ({ environment = 'development' } = {}) {
     routes () {
       this.namespace = 'api'
 
+      this.post('/pedido', () => {
+        return [
+          {
+            id: 1,
+            sabor: 'Banana',
+            tempoPreparo: 0
+          },
+          {
+            id: 2,
+            sabor: 'Morango',
+            tempoPreparo: 0
+          },
+          {
+            id: 3,
+            sabor: 'Kiwi',
+            tempoPreparo: 5
+          }
+        ]
+      })
+
       this.get('/sabor', () => {
         return [
           {

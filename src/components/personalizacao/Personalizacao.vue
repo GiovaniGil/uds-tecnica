@@ -46,10 +46,15 @@
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer />
-                  <v-btn @click="gravar()"  color="success" rounded>Finalizar pedido</v-btn>
+                  <v-btn @click="resumir()"  color="success" rounded>Resumo pedido</v-btn>
                   <v-btn @click="refazer()" color="error" rounded>Refazer Pedido</v-btn>
                 </v-card-actions>
               </v-card>
+            </v-col>
+          </v-row>
+          <v-row align="center" justify="center" v-show="exibeResumo">
+            <v-col>
+                <ResumoPedido/>
             </v-col>
           </v-row>
         </v-container>
@@ -60,8 +65,12 @@
 <script>
 import EventBus from '../../../messages/event-bus'
 import PersonalizacaoService from '../../domain/personalizacao/PersonalizacaoService'
+import ResumoPedido from '../resumo/ResumoPedido'
 export default {
   name: 'Personalizacao',
+  components: {
+    ResumoPedido
+  },
   props: [],
   mounted () {
 
@@ -78,19 +87,21 @@ export default {
   data: () => ({
     entidade: {},
     formValido: false,
-    personalizacaoItems: []
+    personalizacaoItems: [],
+    exibeResumo: false
   }),
   methods: {
-    gravar () {
-      console.log(JSON.stringify(this.entidade))
+    resumir () {
+      EventBus.$emit('resumir', this.entidade)
+      this.exibeResumo = true
     },
     refazer () {
       this.entidade.personalizacao = []
-      EventBus.$emit('refazer', this.setEntidade)
+      this.exibeResumo = false
+      EventBus.$emit('refazer', this.entidade)
     },
     setEntidade: function (entidade) {
       this.entidade = entidade
-      console.log(JSON.stringify(this.entidade))
       this.entidade.personalizacao = []
     }
   },

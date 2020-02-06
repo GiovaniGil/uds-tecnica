@@ -75,14 +75,9 @@
             </v-col>
           </v-row>
           <v-row align="center" justify="center" v-show="disableForm">
-             <transition
-              name="custom-classes-transition"
-              enter-active-class="animated bounceOutLeft"
-            >
               <v-col>
                   <Personalizacao/>
               </v-col>
-             </transition>
           </v-row>
         </v-container>
       </v-content>
