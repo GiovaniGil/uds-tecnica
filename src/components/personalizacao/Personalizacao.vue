@@ -1,0 +1,114 @@
+<template>
+  <div>
+    <v-app id="inspire">
+      <v-content>
+        <v-container
+        fluid
+        >
+          <v-row
+            align="center"
+            justify="center"
+          >
+            <v-col
+              cols="12"
+              sm="8"
+              md="4"
+            >
+              <v-card class="elevation-12">
+                <v-toolbar
+                  color="primary"
+                  dark
+                  flat
+                >
+                  <v-toolbar-title>Personalize seu pedido</v-toolbar-title>
+                  <v-spacer />
+                  </v-toolbar>
+                <v-card-text>
+                    <!--<p v-for="itemPersonalizacao in personalizacaoItems" v-bind:key="itemPersonalizacao.id">
+                      <v-checkbox
+                        v-model="entidade.personalizacao"
+                        return-object
+                        :label="itemPersonalizacao.item + ' - R$' + itemPersonalizacao.valor"
+                        :value="itemPersonalizacao">
+                      </v-checkbox>
+                    </p>-->
+                    <v-select
+                      label="Personalizar"
+                      required
+                      :items="personalizacaoItems"
+                      multiple
+                      chips
+                      return-object
+                      item-text="item"
+                      item-value="id"
+                      v-model="entidade.personalizacao"
+                    ></v-select>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer />
+                  <v-btn @click="gravar()"  color="success" rounded>Finalizar pedido</v-btn>
+                  <v-btn @click="refazer()" color="error" rounded>Refazer Pedido</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-content>
+    </v-app>
+  </div>
+</template>
+<script>
+import EventBus from '../../../messages/event-bus'
+export default {
+  name: 'Personalizacao',
+  props: [],
+  mounted () {
+
+  },
+  created () {
+    EventBus.$on('entidade', this.setEntidade)
+  },
+  data: () => ({
+    entidade: {},
+    formValido: false,
+    personalizacaoItems: [
+      {
+        id: 1,
+        item: 'Granola',
+        tempoPreparo: 0,
+        valor: 0
+      },
+      {
+        id: 2,
+        item: 'Leite em pó',
+        tempoPreparo: 0,
+        valor: 3
+      },
+      {
+        id: 3,
+        item: 'Paçoca',
+        tempoPreparo: 3,
+        valor: 3
+      }
+    ]
+  }),
+  methods: {
+    gravar () {
+      console.log(JSON.stringify(this.entidade))
+    },
+    refazer () {
+      this.entidade.personalizacao = []
+      EventBus.$emit('refazer', this.setEntidade)
+    },
+    setEntidade: function (entidade) {
+      this.entidade = entidade
+      console.log(JSON.stringify(this.entidade))
+      this.entidade.personalizacao = []
+    }
+  },
+  computed: {
+
+  }
+}
+</script>
+<style scoped lang="scss"></style>
