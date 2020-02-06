@@ -1,11 +1,12 @@
-export default class PersonalizacaoService {
-// eslint-disable-next-line no-useless-constructor
-  constructor () {
-  }
+import Vue from 'vue'
 
+export default class TamanhoService {
   lista () {
+    return Vue.http.get('/api/personalizacao')
+      .then(response => response.data, err => {
+        console.log(err)
+      })
   }
-
   cadastra (sabor) {
     console.log(sabor)
   }

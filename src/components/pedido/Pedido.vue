@@ -93,6 +93,8 @@
 import Pedido from '../../domain/pedido/PedidoModel'
 import EventBus from '../../../messages/event-bus'
 import Personalizacao from '../personalizacao/Personalizacao'
+import SaborService from '../../domain/sabor/SaborService'
+import TamanhoService from '../../domain/tamanho/TamanhoService'
 export default {
   name: 'Pedido',
   components: {
@@ -116,47 +118,25 @@ export default {
     saborProdutoRules: [
       (v) => !!v || 'Campo "Sabor" é obrigatório'
     ],
-    tamanhoItems: [
-      {
-        id: 1,
-        tamanho: 'Pequeno - 300ml',
-        tempoPreparo: 5,
-        valor: 10
-      },
-      {
-        id: 2,
-        tamanho: 'Médio - 500ml',
-        tempoPreparo: 7,
-        valor: 13
-      },
-      {
-        id: 3,
-        tamanho: 'Grande - 700ml',
-        tempoPreparo: 10,
-        valor: 15
-      }
-    ],
-    saborItems: [
-      {
-        id: 1,
-        sabor: 'Banana',
-        tempoPreparo: 0
-      },
-      {
-        id: 2,
-        sabor: 'Morango',
-        tempoPreparo: 0
-      },
-      {
-        id: 3,
-        sabor: 'Kiwi',
-        tempoPreparo: 5
-      }
-    ]
+    tamanhoItems: [],
+    saborItems: [],
+    errors: []
   }),
   created () {
     EventBus.$on('refazer', this.limpar)
     this.entidade = Object.assign({}, Pedido)
+
+    // Carrega dados dos sabores disponíveis
+    let saborService = new SaborService()
+    saborService.lista().then(res => {
+      this.saborItems = res
+    }, err => console.log(err))
+
+    // Carrega dados dos tamanhos disponíveis
+    let tamanhoService = new TamanhoService()
+    tamanhoService.lista().then(res => {
+      this.tamanhoItems = res
+    }, err => console.log(err))
   },
   mounted () {
     this.$refs.pedidoForm.reset()

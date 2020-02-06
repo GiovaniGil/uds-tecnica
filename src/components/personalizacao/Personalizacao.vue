@@ -59,6 +59,7 @@
 </template>
 <script>
 import EventBus from '../../../messages/event-bus'
+import PersonalizacaoService from '../../domain/personalizacao/PersonalizacaoService'
 export default {
   name: 'Personalizacao',
   props: [],
@@ -67,30 +68,17 @@ export default {
   },
   created () {
     EventBus.$on('entidade', this.setEntidade)
+
+    // Carrega dados das personalizações disponíveis
+    let personalizacaoService = new PersonalizacaoService()
+    personalizacaoService.lista().then(res => {
+      this.personalizacaoItems = res
+    }, err => console.log(err))
   },
   data: () => ({
     entidade: {},
     formValido: false,
-    personalizacaoItems: [
-      {
-        id: 1,
-        item: 'Granola',
-        tempoPreparo: 0,
-        valor: 0
-      },
-      {
-        id: 2,
-        item: 'Leite em pó',
-        tempoPreparo: 0,
-        valor: 3
-      },
-      {
-        id: 3,
-        item: 'Paçoca',
-        tempoPreparo: 3,
-        valor: 3
-      }
-    ]
+    personalizacaoItems: []
   }),
   methods: {
     gravar () {

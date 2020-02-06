@@ -5,9 +5,12 @@ import VuePageTransition from 'vue-page-transition'
 import vuetify from './plugins/vuetify'
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import VueResource from 'vue-resource'
+import { makeServer } from '../mock/server'
 
 Vue.use(VuePageTransition)
 Vue.use(VueResource)
+
+makeServer()
 
 Vue.config.productionTip = false
 
