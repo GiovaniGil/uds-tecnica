@@ -52,32 +52,27 @@
               </v-card>
             </v-col>
           </v-row>
-          <v-row align="center" justify="center" v-show="exibeResumo">
-            <v-col>
-                <ResumoPedido/>
-            </v-col>
-          </v-row>
         </v-container>
       </v-content>
     </v-app>
   </div>
 </template>
 <script>
-import EventBus from '../../../messages/event-bus'
 import PersonalizacaoService from '../../domain/personalizacao/PersonalizacaoService'
-import ResumoPedido from '../resumo/ResumoPedido'
+import { mapState, mapMutations } from 'vuex'
 export default {
   name: 'Personalizacao',
   components: {
-    ResumoPedido
   },
   props: [],
   mounted () {
-
+  },
+  beforeCreate () {
+    if (!this.$store.state.entidade.clienteNome) {
+      this.$router.push('/')
+    }
   },
   created () {
-    EventBus.$on('entidade', this.setEntidade)
-
     // Carrega dados das personalizações disponíveis
     let personalizacaoService = new PersonalizacaoService()
     personalizacaoService.lista().then(res => {
@@ -85,28 +80,25 @@ export default {
     }, err => console.log(err))
   },
   data: () => ({
-    entidade: {},
     formValido: false,
-    personalizacaoItems: [],
-    exibeResumo: false
+    personalizacaoItems: []
   }),
   methods: {
     resumir () {
-      EventBus.$emit('resumir', this.entidade)
-      this.exibeResumo = true
+      this.$router.push('resumo')
     },
     refazer () {
-      this.entidade.personalizacao = []
-      this.exibeResumo = false
-      EventBus.$emit('refazer', this.entidade)
+      this.resetState()
+      this.$router.push('/')
     },
-    setEntidade: function (entidade) {
-      this.entidade = entidade
-      this.entidade.personalizacao = []
-    }
+    ...mapMutations([
+      'resetState'
+    ])
   },
   computed: {
-
+    ...mapState({
+      entidade: state => state.entidade
+    })
   }
 }
 </script>

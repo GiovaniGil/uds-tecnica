@@ -21,7 +21,7 @@
                   dark
                   flat
                 >
-                  <v-toolbar-title>Informe nome, tamanho e o sabor desejado</v-toolbar-title>
+                  <v-toolbar-title>Informe os dados do pedido</v-toolbar-title>
                   <v-spacer />
                   </v-toolbar>
                 <v-card-text>
@@ -34,7 +34,6 @@
                       type="text"
                       required
                       :rules="nomeRules"
-                      :disabled="disableForm"
                     />
 
                      <v-select
@@ -48,7 +47,6 @@
                       outlined
                       required
                       :rules="tamanhoProdutoRules"
-                      :disabled="disableForm"
                     ></v-select>
 
                       <v-select
@@ -62,7 +60,6 @@
                       outlined
                       required
                       :rules="saborProdutoRules"
-                      :disabled="disableForm"
                     ></v-select>
                   </v-form>
                 </v-card-text>
@@ -74,11 +71,6 @@
               </v-card>
             </v-col>
           </v-row>
-          <v-row align="center" justify="center" v-show="disableForm">
-              <v-col>
-                  <Personalizacao/>
-              </v-col>
-          </v-row>
         </v-container>
       </v-content>
     </v-app>
@@ -86,22 +78,18 @@
 </template>
 <script>
 import Pedido from '../../domain/pedido/PedidoModel'
-import EventBus from '../../../messages/event-bus'
-import Personalizacao from '../personalizacao/Personalizacao'
 import SaborService from '../../domain/sabor/SaborService'
 import TamanhoService from '../../domain/tamanho/TamanhoService'
+import { mapState } from 'vuex'
 export default {
   name: 'Pedido',
   components: {
-    Personalizacao
   },
   props: {
     msg: String
   },
   data: () => ({
-    entidade: {},
     formValido: false,
-    disableForm: false,
     lazy: false,
     nomeRules: [
       (v) => !!v || 'Campo "Nome" é obrigatório',
@@ -118,9 +106,9 @@ export default {
     errors: []
   }),
   created () {
-    EventBus.$on('refazer', this.limpar)
-    this.entidade = Object.assign({}, Pedido)
-
+    if (!this.$store.state.entidade) {
+      this.$store.state.entidade = Object.assign({}, Pedido)
+    }
     // Carrega dados dos sabores disponíveis
     let saborService = new SaborService()
     saborService.lista().then(res => {
@@ -139,19 +127,19 @@ export default {
   methods: {
     gravar () {
       this.$refs.pedidoForm.validate()
-      this.disableForm = this.formValido
       if (this.formValido) {
-        EventBus.$emit('entidade', this.entidade)
+        this.$router.push('personalizacao')
       }
     },
     limpar () {
-      this.entidade = Object.assign({}, Pedido)
+      this.$store.state.entidade = Object.assign({}, Pedido)
       this.$refs.pedidoForm.reset()
-      this.disableForm = false
     }
   },
   computed: {
-
+    ...mapState({
+      entidade: state => state.entidade
+    })
   }
 }
 </script>

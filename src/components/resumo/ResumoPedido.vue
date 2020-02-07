@@ -20,13 +20,13 @@
                   dark
                   flat
                 >
-                  <v-toolbar-title>Resumo do seu pedido</v-toolbar-title>
+                  <v-toolbar-title>Resumo do pedido</v-toolbar-title>
                   <v-spacer />
                   </v-toolbar>
                 <v-card-text>
                   <v-layout row wrap id="abaIndicador">
                     <v-flex xs12>
-                      Nome: {{this.entidade.clienteNome}}
+                      Nome: {{this.$store.state.entidade.clienteNome}}
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12>
@@ -36,7 +36,7 @@
                       Sabor: {{this.entidade.saborProduto ? this.entidade.saborProduto.sabor : 0 }}
                       <v-divider></v-divider>
                     </v-flex>
-                    <v-flex xs12>
+                    <v-flex xs12 v-if="entidade.personalizacao.length > 0">
                      <v-list disabled>
                         <v-subheader>Items adicionais: </v-subheader>
                         <v-list-item-group v-model="entidade.personalizacao" color="primary">
@@ -66,10 +66,39 @@
                 <v-card-actions>
                   <v-spacer />
                   <v-btn @click="gravar()"  color="success" rounded>Finalizar pedido</v-btn>
-                  <v-btn @click="refazer()" color="error" rounded>Refazer Pedido</v-btn>
+                  <v-btn @click="refazer()" color="primary" rounded>Novo pedido</v-btn>
                 </v-card-actions>
               </v-card>
             </v-col>
+          </v-row>
+          <v-row justify="center">
+            <v-dialog v-model="dialog" persistent max-width="290">
+              <v-card>
+                <v-toolbar color="success" dark>
+                  <v-toolbar-title>Pedido salvo!</v-toolbar-title>
+                </v-toolbar>
+                <v-spacer></v-spacer>
+                <v-card-text>Seu pedido ficará pronto em breve. Obrigado!</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="success" @click="refazer()">Ok</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </v-row>
+          <v-row justify="center">
+            <v-dialog v-model="dialogError" persistent max-width="290">
+              <v-card>
+                <v-toolbar color="error" dark>
+                  <v-toolbar-title>Erro ao salvar</v-toolbar-title>
+                </v-toolbar>
+                <v-card-text>Entre em contato com o suporte técnico.</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="error" @click="refazer()">Ok</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-row>
         </v-container>
       </v-content>
@@ -77,46 +106,56 @@
   </div>
 </template>
 <script>
-import EventBus from '../../../messages/event-bus'
 import PedidoService from '../../domain/pedido/PedidoService'
+import { mapState, mapMutations } from 'vuex'
 export default {
   name: 'ResumoPedido',
   props: [],
   created () {
-    EventBus.$on('resumir', this.setEntidade)
+  },
+  beforeCreate () {
+    if (!this.$store.state.entidade.clienteNome) {
+      this.$router.push('/')
+    }
   },
   mounted () {
-
   },
   data: () => ({
-    entidade: {},
     money: {
       decimal: ',',
       thousands: '.',
       prefix: 'R$ ',
       suffix: ' #',
       precision: 2,
-      masked: false /* doesn't work with directive */
-    }
+      masked: false
+    },
+    dialog: false,
+    dialogError: false
   }),
   methods: {
-    setEntidade: function (entidade) {
-      this.entidade = entidade
-    },
     refazer () {
-      this.entidade.personalizacao = []
-      this.exibeResumo = false
-      EventBus.$emit('refazer', this.entidade)
+      this.resetState()
+      this.$router.push('/')
     },
     gravar () {
       let pedidoService = new PedidoService()
       pedidoService.cadastra(this.entidade)
         .then(res => {
           console.log('200')
-        }, err => console.log(err))
-    }
+          this.dialog = true
+        }, err => {
+          console.log(err)
+          this.dialogError = true
+        })
+    },
+    ...mapMutations([
+      'resetState'
+    ])
   },
   computed: {
+    ...mapState({
+      entidade: state => state.entidade
+    }),
     valorTotal () {
       let valorTotal = 0
       if (this.entidade.tamanhoProduto) {
