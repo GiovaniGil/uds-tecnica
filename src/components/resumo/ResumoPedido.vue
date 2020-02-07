@@ -30,10 +30,10 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12>
-                      Tamanho: {{this.entidade.tamanhoProduto ? this.entidade.tamanhoProduto.tamanho : 0}}
+                      Tamanho: {{this.entidade.tamanhoProduto.tamanho + ' - '+ formatReal(this.entidade.tamanhoProduto.valor)}}
                     </v-flex>
                     <v-flex xs12>
-                      Sabor: {{this.entidade.saborProduto ? this.entidade.saborProduto.sabor : 0 }}
+                      Sabor: {{this.entidade.saborProduto.sabor}}
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12 v-if="entidade.personalizacao.length > 0">
@@ -48,7 +48,7 @@
                               <v-icon>check_box</v-icon>
                             </v-list-item-icon>
                             <v-list-item-content>
-                              <v-list-item-title v-text="personalizacao.item"></v-list-item-title>
+                              <v-list-item-title v-text="personalizacao.item + ' - ' + formatReal(personalizacao.valor)"></v-list-item-title>
                             </v-list-item-content>
                           </v-list-item>
                         </v-list-item-group>
@@ -56,7 +56,7 @@
                       <v-divider></v-divider>
                     </v-flex>
                     <v-flex xs12>
-                      Valor total: R$ {{valorTotal}}
+                      Valor total: {{formatReal(valorTotal)}}
                     </v-flex>
                     <v-flex xs12>
                       Tempo de espera: {{tempoTotal + ' minutos'}}
@@ -150,7 +150,10 @@ export default {
     },
     ...mapMutations([
       'resetState'
-    ])
+    ]),
+    formatReal (n) {
+      return 'R$ ' + n.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+,)/g, '$1.')
+    }
   },
   computed: {
     ...mapState({
